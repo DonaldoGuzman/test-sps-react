@@ -16,7 +16,7 @@ function EditUser() {
 
   return (
     <div>
-      <p>Edição de Usuário</p>
+      <p>Editar de Usuário</p>
       <div>
         <form>
           <label>Nome:</label>

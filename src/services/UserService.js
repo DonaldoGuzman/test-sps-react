@@ -1,22 +1,76 @@
+// src/services/UserService.js
 import axios from "axios";
 
 class UserService {
+  constructor() {
+    this.api = axios.create({
+      baseURL: process.env.REACT_APP_SERVER_URL,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Agregar token automáticamente si está presente
+    this.api.interceptors.request.use((config) => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+  }
+            async login(credentials) {
+          try {
+            const { data } = await this.api.post("/auth/login", credentials);
+            return data;
+          } catch (error) {
+            throw new Error(error.response?.data?.message || "Error al iniciar sesión");
+          }
+        }
+      async register(userData) {
+      try {
+        const { data } = await this.api.post("/auth/register", userData);
+        return data;
+      } catch (error) {
+        throw new Error(error.response?.data?.message || "Error al registrar usuario");
+      }
+    }
+
   async list() {
-    const users = await axios.get(`${process.env.REACT_APP_SERVER_URL}/users`);
-    return users;
+    try {
+      const { data } = await this.api.get("/users");
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Error al listar usuarios");
+    }
   }
-  async get(id) {
-    throw new Error("Not implemented");
+
+  async create(userData) {
+    try {
+      const { data } = await this.api.post("/auth/register", userData);
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Error al crear usuario");
+    }
   }
-  async create(data) {
-    throw new Error("Not implemented");
+
+  async update(email, userData) {
+    try {
+      const { data } = await this.api.post(`/auth/update/${email}`, userData);
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Error al actualizar usuario");
+    }
   }
-  async delete(id) {
-    throw new Error("Not implemented");
-  }
-  async update(id, data) {
-    throw new Error("Not implemented");
+
+  async delete(email) {
+    try {
+      const { data } = await this.api.delete(`/auth/users/${email}`);
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Error al eliminar usuario");
+    }
   }
 }
 
-export default UserService;
+export default new UserService();
